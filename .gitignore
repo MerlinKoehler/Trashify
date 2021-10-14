@@ -365,3 +365,5 @@ FodyWeavers.xsd
 # Custom
 *.avi
 Trashify/env
+Trashify/venv
+venv

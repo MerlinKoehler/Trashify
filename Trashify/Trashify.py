@@ -56,7 +56,7 @@ class ObjectDetection:
         self.model.to(self.device)
         frame = [frame]
         results = self.model(frame)
-        labels, cord = results.xyxyn[0][:, -1].numpy(), results.xyxyn[0][:, :-1].numpy()
+        labels, cord = results.xyxyn[0][:, -1].cpu().numpy(), results.xyxyn[0][:, :-1].cpu().numpy()
         return labels, cord
 
     def class_to_label(self, x):
@@ -96,6 +96,8 @@ class ObjectDetection:
         cv2.startWindowThread()
         player = cameraStart()
         assert player.isOpened()
+        count = cv2.cuda.getCudaEnabledDeviceCount()
+        print("CUDA: ", count)
         #x_shape = int(player.get(cv2.CAP_PROP_FRAME_WIDTH))
         #y_shape = int(player.get(cv2.CAP_PROP_FRAME_HEIGHT))
         #four_cc = cv2.VideoWriter_fourcc(*"MJPG")
