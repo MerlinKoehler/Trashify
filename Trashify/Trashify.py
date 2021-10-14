@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import pafy
 from time import time
+from camera import cameraStart
 
 
 class ObjectDetection:
@@ -92,24 +93,31 @@ class ObjectDetection:
         and write the output into a new file.
         :return: void
         """
-        player = self.get_video_from_camera()
+        cv2.startWindowThread()
+        player = cameraStart()
         assert player.isOpened()
-        x_shape = int(player.get(cv2.CAP_PROP_FRAME_WIDTH))
-        y_shape = int(player.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        four_cc = cv2.VideoWriter_fourcc(*"MJPG")
-        out = cv2.VideoWriter(self.out_file, four_cc, 20, (x_shape, y_shape))
+        #x_shape = int(player.get(cv2.CAP_PROP_FRAME_WIDTH))
+        #y_shape = int(player.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        #four_cc = cv2.VideoWriter_fourcc(*"MJPG")
+        #out = cv2.VideoWriter(self.out_file, four_cc, 20, (x_shape, y_shape))
         while True:
             start_time = time()
-            ret, frame = player.read()
+            ret, frame = player.read()  # Grab a frame
             assert ret
             results = self.score_frame(frame)
             frame = self.plot_boxes(results, frame)
             end_time = time()
             fps = 1/np.round(end_time - start_time, 3)
             print(f"Frames Per Second : {fps}")
-            cv2.imshow('my webcam', frame)
-            out.write(frame)
+            cv2.namedWindow("Webcam")
+            cv2.imshow("Webcam", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+            #out.write(frame)
+
+        player.release()  # Release camera
+        cv2.destroyAllWindows()  # Close all windows
 
 # Create a new object and execute.
-a = ObjectDetection("https://www.youtube.com/watch?v=dwD1n7N7EAg")
+a = ObjectDetection("")
 a()
